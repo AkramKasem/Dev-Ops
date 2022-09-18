@@ -1,0 +1,114 @@
+# هنا انا بمشي خطوه خطوه بمعنى يعنى المفروض يكون فى جافا 
+# بعدين يبقى فى ميفن 
+# بعدين اعمل الكود وهكذا كل ده بعمله بالترتيب اكنى بعمل هيكله للمشروع
+
+
+
+#  الحاجه اللى هسططبها او اكبر حاجه وليكن جافا 11
+# FROM baseImage
+FROM openjdk:11
+
+
+# هنا بعمل مسار لملف عشان احط الحاجات الى عاوزها فيه يعنى ذي مجلد داخل ال الدوكر
+# WORKDIR /the/workdir/path
+WORKDIR /app
+
+
+# هنا بجيب الملفات الى عاوز احطها فى الدوكر واخليه يعملها هنا بجيب الفيل والمسار اللى فى الدوكر اللى هحطها فيه
+# COPY source dest -----> COPY . .   معناها انقل كل الملفات بتاعت المشروع داخل الدوكر
+# COPY source dest
+
+COPY pom.xml .
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+COPY src src
+
+# هنا بقوله شغلى التطبيق بس على حسب الامر الى هكتبه
+# RUN command
+# RUN mvn -f /home/app/pom.xml clean package -----. مثلا كدا لو هوا فى مسار داخل الدوكر 
+# RUN mvn package ------> كدا امر مباشر بدون حوارات
+RUN mvn package
+
+# هنا بحط البورت اللى هكلم فيه المشروع من داخل الدوكر 
+# EXPOSE port
+EXPOSE 4000
+
+# CMD [ "executable" ] ---->  هذا وقت الشغيل بقا بكتب الاوامر الى تتنفذ من بناء وما شابهه
+# CMD [ "npm" ,"start" ] ------> مثال عل  ال نود ج اس  
+
+
+
+
+
+
+# command docker
+
+ 
+# هنا بقا هعمل بناء للملف كله بس 
+# docker build  (-t  name_image ) ./name_docker_file  or docker build (-t  name_image ) .
+
+
+# هنا بقا بشوف كل الصور االلى موجوده فى دوكر 
+# docker image ls
+
+
+# هنا بقا عشان اشغل الصوره 
+# docker run (--name  name_image_container) (-v path_project : name_layer_in image (:ro) ) (-v name_file) (-d)  (-p 4000:4000) name_image 
+
+# (--name  name_image_container) ------->  هنا بقا بعمل اسم للكونتينر عشان لو هعمل اكتر من واحد على نفس الصوره
+
+# (-v path_project : name_layer_in image )  ----->  دى بعملها عشان لما اغير حاجه مش كل شويه اعمل بناء للدوكر فبعمل هوت ريلود  بخلى االى يتغير هنا يسمع هنا والعكس بدون عمل ريبلد
+# (-v path_project : name_layer_in image : ro )  -----> عشان اعمل قراءه فقط انه يغير فى المشروع يسمع فى الدوكر وليس العكس
+# $(pwd)--> linux  , %cd% --> windows   print working directory  -------> replace path_project
+# (-v name_file) -----> بعمل ده عشان لو عاوز امنع التتغير فى ملف لو عامل  هوت ريلود 
+
+
+
+
+# -d ----> هنا بقا عشان مش يظهر اى معلومات عن الصوره 
+
+# (-p 4000:4000) ------->  هنا بقول له خلى البورت اللى عملته يسمع على الجهاز على بورت 4000 برضو وممكن اغيره عادى
+
+
+
+# هنا بيجيب اللى بيحصل والاخطاء 
+# docker logs name_image_container
+
+
+
+
+# هنا هعرض اللى شغال بس
+# docker ps
+
+
+
+
+
+# هنا بقا هعمل بناء للملف كله بس 
+# docker run (--name  name_image_container) (-d) name_image 
+
+
+
+# ده عشان افتح الكونتينر واعدل عليه واعمل اللى عاوزه فيه وهوا على ال دوكر نفسه 
+# docker exec -it name_image_container bash 
+
+
+
+# ده بعمله عشان مش يحمل كل حاجه معاه عشان اعمل تخطى لبعض الملفات حتى لا ياخذ الجميع
+# .dockerignore
+# بداخله بحط اسماء الملفات والمجلدات  الى مش عاوزه يضعها فى الاعتبار
+
+
+
+# 
+
+
+
+
+## full example
+FROM openjdk:11
+WORKDIR /app
+COPY . .
+RUN javac Main.java
+CMD ["java", "Main"]
