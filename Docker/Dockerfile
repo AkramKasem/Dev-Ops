@@ -24,15 +24,34 @@ COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
 
+
+# عشان مثلا لو عاوز اعمل حاجه فى حاله معينه 
+
+ARG ENV
+RUN if["$ENV" == "dev"]; \ 
+    then  mvn install package ; \
+    else  mvn install package ; \
+    fi
+
 # هنا بقوله شغلى التطبيق بس على حسب الامر الى هكتبه
 # RUN command
 # RUN mvn -f /home/app/pom.xml clean package -----. مثلا كدا لو هوا فى مسار داخل الدوكر 
 # RUN mvn package ------> كدا امر مباشر بدون حوارات
 RUN mvn package
 
+
+
+
 # هنا بحط البورت اللى هكلم فيه المشروع من داخل الدوكر 
 # EXPOSE port
 EXPOSE 4000
+
+# لو عاوز اعمل متغيرات واستخدمها 
+ENV PORT=8080
+# Expose the ports your application will use
+EXPOSE $PORT
+
+
 
 # CMD [ "executable" ] ---->  هذا وقت الشغيل بقا بكتب الاوامر الى تتنفذ من بناء وما شابهه
 # CMD [ "npm" ,"start" ] ------> مثال عل  ال نود ج اس  
@@ -54,7 +73,7 @@ EXPOSE 4000
 
 
 # هنا بقا عشان اشغل الصوره 
-# docker run (--name  name_image_container) (-v path_project : name_layer_in image (:ro) ) (-v name_file) (-d)  (-p 4000:4000) name_image 
+# docker run (--name  name_image_container) (-v path_project : name_layer_in image (:ro) ) (-v name_file) (--env PORT=8080 --env MODE=x ) (--env-file ./.env)  (-d)  (-p 4000:4000) name_image 
 
 # (--name  name_image_container) ------->  هنا بقا بعمل اسم للكونتينر عشان لو هعمل اكتر من واحد على نفس الصوره
 
@@ -63,8 +82,8 @@ EXPOSE 4000
 # $(pwd)--> linux  , %cd% --> windows   print working directory  -------> replace path_project
 # (-v name_file) -----> بعمل ده عشان لو عاوز امنع التتغير فى ملف لو عامل  هوت ريلود 
 
-
-
+# (--env PORT=8080 --env MODE=x ) دى عشان لو عاوز ابعتله متغيرات او عنده متغيرات فى الملف وانا عاوز اغيرها
+# (--env-file ./.env) دى عشان لو عامل ملف فيه كل المتغيرات ابعتها فى ملف افضل من الاوامر
 
 # -d ----> هنا بقا عشان مش يظهر اى معلومات عن الصوره 
 
@@ -112,3 +131,42 @@ WORKDIR /app
 COPY . .
 RUN javac Main.java
 CMD ["java", "Main"]
+
+
+
+
+
+
+## full example Spring boot
+
+# Use the official Maven image to build the application
+FROM maven:3-jdk-11 AS build
+WORKDIR /comma
+
+# Copy the Maven project files
+COPY pom.xml .
+COPY src ./src
+
+# Clean and install the application
+RUN mvn clean package
+RUN mvn install package
+#RUN mvn clean install
+
+# Use the official OpenJDK base image
+FROM openjdk:11-jre-slim As runtime
+
+# Set the working directory inside the container
+WORKDIR /comma
+
+# Copy the compiled Spring Boot JAR file from the build stage
+COPY --from=build /comma/target/E-Commerce-0.0.1-SNAPSHOT.jar app.jar
+
+# Expose the ports your application will use
+EXPOSE 8080
+
+# Start the Spring Boot application
+CMD ["java", "-jar", "app.jar"]
+
+
+#docker build -t  comma-care  .
+#docker run --name  comma_care_container  -v D:\Working\Mostafa\E-Commerce:/comma -d  -p 8080:8080 comma-care

@@ -1,0 +1,4 @@
+/target
+/.idea
+/back-end.iml
+docker-compose*
