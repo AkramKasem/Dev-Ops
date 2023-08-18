@@ -1,0 +1,27 @@
+# اى الفائده
+# بدل ما تقعد ترن اوامر لا هوا بيرن كل حاجه وبيعمل الاعدادات ويرن علطول 
+# docker build -t  comma-care  .
+# docker run --name  comma_care_container  -v D:\Working\Mostafa\E-Commerce:/comma -d  -p 8080:8080 comma-care
+# ذى الاثنين الى فوق هوا عملهم 
+# خد الدوكر فايل رنه فى البلد وعمل الاعدادات ورن
+
+
+version: '3' # لازم تعرف الاصدار اللى هتشتغل عليه 
+
+# عشان اعمل الإمج والكونتينرز عان لو عندى اكتر من واحد
+services:
+  java-app: # حط اسم للمشروع براحتك  عادى
+    container_name: comma_care_container  # حط اى اسم يبقى للكونتينر عشان يبقى اسمه لما يرن
+    build: .  # دى عشان يوصل للدوكر فايل ويرن على اساسه
+    # docker run --name  comma_care_container  -v D:\Working\Mostafa\E-Commerce:/comma -d  -p 8080:8080 comma-care 
+    # هنعمل الاعدادات اللى فوق 
+    volumes: # عشان اعمل الاعدادات براحتى مثلا قراءه بس او اى كان
+      # -hostPath:containerPath:ro  # like  -v D:\Working\Mostafa\E-Commerce:/comma
+      - .:/comma:ro
+    ports:
+      - "8080:8080"
+
+
+
+# عشان ارن الملف ده كل اللى هعمله
+# docker-compose up
